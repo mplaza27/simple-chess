@@ -1,0 +1,91 @@
+# Cargo.toml — the project manifest
+#
+# Every Rust project has one of these. It is the equivalent of:
+#   package.json  in JavaScript/Node
+#   pyproject.toml in Python
+#   pom.xml       in Java (Maven)
+#
+# Cargo reads this file to know what to build, what libraries to use, and
+# how to optimise the output.
+
+[package]
+name    = "simple-chess"   # The crate name. Used in `use simple_chess::...`.
+version = "0.1.0"          # Semantic versioning: MAJOR.MINOR.PATCH
+edition = "2021"           # Which edition of Rust to use. 2021 is current stable.
+
+# ── Build targets ───────────────────────────────────────────────────────────
+#
+# This project compiles as TWO different things:
+
+# 1. A library — used by `cargo test` (runs natively, fast)
+#    and also produces the WASM binary for the browser.
+#    `cdylib` = C-compatible dynamic library = what WASM needs.
+#    `rlib`   = Rust library = what `cargo test` links against.
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+# 2. A binary — the WASM entry point with `fn main()`.
+#    Trunk uses this as the root of the WASM bundle.
+[[bin]]
+name = "simple-chess"
+path = "src/main.rs"
+
+# ── Dependencies ─────────────────────────────────────────────────────────────
+#
+# `[dependencies]` lists crates (libraries) your project uses.
+# Cargo downloads them from crates.io (Rust's package registry) automatically
+# the first time you build.
+[dependencies]
+
+# Leptos — the reactive web UI framework.
+# `features = ["csr"]` enables Client-Side Rendering mode (pure WASM, no server).
+leptos = { version = "0.7", features = ["csr"] }
+
+# shakmaty — chess rules engine.
+# Handles legal move generation, check/checkmate detection, FEN parsing,
+# and SAN (Standard Algebraic Notation) parsing used for opening lines.
+shakmaty = "0.30"
+
+# wasm-bindgen — the glue between Rust/WASM and JavaScript.
+wasm-bindgen = "0.2"
+
+# gloo-timers — browser-friendly timer utilities.
+# We use `TimeoutFuture` to add a 500 ms delay before the computer auto-plays.
+# The `futures` feature enables the async/await API.
+gloo-timers = { version = "0.3", features = ["futures"] }
+
+# serde — serialization/deserialization framework.
+# Used to parse Lichess Explorer API JSON responses.
+serde = { version = "1", features = ["derive"] }
+
+# serde_json — JSON parser built on serde.
+serde_json = "1"
+
+# ── WASM-only dependencies ───────────────────────────────────────────────────
+# These crates use browser APIs and only compile for the wasm32 target.
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+# gloo-net — HTTP fetch for the browser. Used to load opening TSV files at
+# runtime instead of embedding them in the WASM binary (saves ~370 KB).
+gloo-net = { version = "0.6", features = ["http"] }
+
+# gloo-storage — localStorage wrapper for caching Explorer API responses.
+gloo-storage = "0.3"
+
+# js-sys — raw JS API bindings. Used for Math.random() in weighted move selection.
+js-sys = "0.3"
+
+# web-sys — browser API bindings. Used for optional debug logging via console.
+web-sys = { version = "0.3", features = ["console"] }
+
+# ── Build profiles ───────────────────────────────────────────────────────────
+
+# Development build: compiled faster, larger output, includes debug info.
+[profile.dev]
+opt-level = 1   # Slight optimisation to keep WASM from being too slow to run.
+
+# Release build: compiled slower, smallest/fastest output.
+[profile.release]
+opt-level    = "z"  # Optimise for size ("z" = smallest binary, important for WASM).
+lto          = true # Link-Time Optimisation.
+codegen-units = 1   # One compilation unit → better cross-crate optimisation.

@@ -1,0 +1,20 @@
+# Rust build output
+/target
+/dist
+
+# Environment (contains secrets)
+.env
+
+# Python venv
+venv/
+
+# Playwright / E2E
+e2e/node_modules/
+e2e/test-results/
+e2e/playwright-report/
+
+# OS / editor
+.DS_Store
+*.swp
+*.swo
+*~

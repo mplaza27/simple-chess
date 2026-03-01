@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple Chess</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #1a0e0a; }
+  </style>
+</head>
+<body>
+  <link data-trunk rel="rust" data-bin="simple-chess" />
+  <!-- Copy the openings TSV files into dist/ so they can be fetched at runtime.
+       This keeps them out of the WASM binary (~370 KB saved). -->
+  <link data-trunk rel="copy-dir" href="assets/openings" />
+</body>
+</html>
