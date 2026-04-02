@@ -211,12 +211,3 @@ This builds HTML documentation from all `///` and `//!` comments in the
 source and opens it in your browser. Every public item is documented.
 
 ---
-
-## What's Next (Future Work)
-
-- [ ] AI opponent (minimax algorithm or engine integration via UCI)
-- [ ] Move history / notation panel
-- [ ] Drag-and-drop piece movement
-- [ ] Offer draw / resign buttons
-- [ ] Promotion piece chooser dialog
-- [ ] Timed games (chess clock)
